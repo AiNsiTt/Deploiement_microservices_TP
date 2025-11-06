@@ -1,0 +1,202 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------
+  # 1. API Gateway (Nginx comme proxy/routeur simple)
+  # ----------------------------------------------------------------
+  api-gateway:
+    build:
+      context: ./gateway/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - keycloak
+      - user-service
+      - product-service
+      - order-service
+      - payment-service
+      - inventory-service
+      - notification-service
+    networks:
+      - myboutique-network
+
+  # ----------------------------------------------------------------
+  # 2. Service d'Authentification Centralisé (Keycloak)
+  # ----------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+      KC_HOSTNAME: localhost
+      KC_HTTP_PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/keycloak/realm-config:/opt/keycloak/data/import
+    depends_on:
+      - keycloak-db
+    networks:
+      - myboutique-network
+
+  keycloak-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    networks:
+      - myboutique-network
+
+  # ----------------------------------------------------------------
+  # 3. Microservices (Placeholders)
+  # ----------------------------------------------------------------
+  user-service:
+    build: ./microservices/user-service
+    environment:
+      DB_HOST: user-db
+    networks:
+      - myboutique-network
+
+  user-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user_data:/var/lib/postgresql/data
+    networks:
+      - myboutique-network
+
+  product-service:
+    build: ./microservices/product-service
+    environment:
+      DB_HOST: product-db
+    networks:
+      - myboutique-network
+
+  product-db:
+    image: mongo:6.0
+    volumes:
+      - product_data:/data/db
+    networks:
+      - myboutique-network
+
+  order-service:
+    build: ./microservices/order-service
+    environment:
+      DB_HOST: order-db
+    networks:
+      - myboutique-network
+
+  order-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order
+      POSTGRES_PASSWORD: password
+    volumes:
+      - order_data:/var/lib/postgresql/data
+    networks:
+      - myboutique-network
+
+  payment-service:
+    build: ./microservices/payment-service
+    environment:
+      DB_HOST: payment-db
+    networks:
+      - myboutique-network
+
+  payment-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: payment
+      POSTGRES_PASSWORD: password
+    volumes:
+      - payment_data:/var/lib/postgresql/data
+    networks:
+      - myboutique-network
+
+  inventory-service:
+    build: ./microservices/inventory-service
+    environment:
+      DB_HOST: inventory-db
+    networks:
+      - myboutique-network
+
+  inventory-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: password
+    volumes:
+      - inventory_data:/var/lib/postgresql/data
+    networks:
+      - myboutique-network
+
+  notification-service:
+    build: ./microservices/notification-service
+    environment:
+      BROKER_HOST: message-broker
+    networks:
+      - myboutique-network
+
+  # ----------------------------------------------------------------
+  # 4. Message Broker (Communication Asynchrone)
+  # ----------------------------------------------------------------
+  message-broker:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672" # Port AMQP
+      - "15672:15672" # Port Management UI
+    networks:
+      - myboutique-network
+
+  # ----------------------------------------------------------------
+  # 5. Monitoring (Prometheus & Grafana - Placeholder)
+  # ----------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./infrastructure/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - myboutique-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - myboutique-network
+
+# ----------------------------------------------------------------
+# Volumes et Réseaux
+# ----------------------------------------------------------------
+volumes:
+  keycloak_data:
+  user_data:
+  product_data:
+  order_data:
+  payment_data:
+  inventory_data:
+  grafana_data:
+
+networks:
+  myboutique-network:
+    driver: bridge

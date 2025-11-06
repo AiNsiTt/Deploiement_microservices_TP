@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:9100'] # Port d'exportation de métriques Nginx (à configurer)
+
+  - job_name: 'microservices'
+    static_configs:
+      - targets: ['user-service:8080', 'product-service:8080', 'order-service:8080', 'payment-service:8080', 'inventory-service:8080', 'notification-service:8080']

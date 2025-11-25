@@ -1,0 +1,95 @@
+graph TB
+    subgraph "Clients"
+        WebApp[🌐 Application Web<br/>React/Vue.js]
+        Mobile[📱 Application Mobile<br/>iOS/Android]
+    end
+
+    subgraph "Gateway Layer - Zero Trust Entry Point"
+        NGINX[🚪 NGINX API Gateway<br/>Reverse Proxy + TLS<br/>Rate Limiting]
+    end
+
+    subgraph "Security & Identity"
+        Keycloak[🔐 Keycloak<br/>Identity Provider<br/>OAuth2/OIDC<br/>RBAC]
+    end
+
+    subgraph "Microservices Layer"
+        UserSvc[👤 User Service<br/>Port: 8001<br/>Gestion utilisateurs]
+        ProductSvc[📦 Product Service<br/>Port: 8002<br/>Catalogue produits]
+        OrderSvc[🛒 Order Service<br/>Port: 8003<br/>Gestion commandes]
+        PaymentSvc[💳 Payment Service<br/>Port: 8004<br/>Paiements sécurisés]
+        InventorySvc[📊 Inventory Service<br/>Port: 8005<br/>Gestion stocks]
+        NotifSvc[🔔 Notification Service<br/>Port: 8006<br/>Notifications temps réel]
+        AdminSvc[👨‍💼 Admin Dashboard<br/>Port: 8007<br/>Tableau de bord]
+    end
+
+    subgraph "Data Layer"
+        UserDB[(🗄️ User DB<br/>PostgreSQL)]
+        ProductDB[(🗄️ Product DB<br/>PostgreSQL)]
+        OrderDB[(🗄️ Order DB<br/>PostgreSQL)]
+        InventoryDB[(🗄️ Inventory DB<br/>PostgreSQL)]
+        KeycloakDB[(🗄️ Keycloak DB<br/>PostgreSQL)]
+        Redis[(⚡ Redis Cache<br/>Session & Cache)]
+    end
+
+    subgraph "Observability"
+        Prometheus[📊 Prometheus<br/>Metrics Collection]
+        Grafana[📈 Grafana<br/>Dashboards]
+        Loki[📝 Loki<br/>Log Aggregation]
+    end
+
+    WebApp -->|HTTPS/TLS| NGINX
+    Mobile -->|HTTPS/TLS| NGINX
+    
+    NGINX -->|JWT Validation| Keycloak
+    NGINX -->|Authenticated Requests| UserSvc
+    NGINX -->|Authenticated Requests| ProductSvc
+    NGINX -->|Authenticated Requests| OrderSvc
+    NGINX -->|Authenticated Requests| PaymentSvc
+    NGINX -->|Authenticated Requests| InventorySvc
+    NGINX -->|Authenticated Requests| NotifSvc
+    NGINX -->|Authenticated Requests| AdminSvc
+
+    UserSvc --> UserDB
+    ProductSvc --> ProductDB
+    OrderSvc --> OrderDB
+    InventorySvc --> InventoryDB
+    Keycloak --> KeycloakDB
+    
+    UserSvc --> Redis
+    ProductSvc --> Redis
+    OrderSvc --> Redis
+    
+    OrderSvc -->|Check Stock| InventorySvc
+    OrderSvc -->|Process Payment| PaymentSvc
+    OrderSvc -->|Send Notification| NotifSvc
+    PaymentSvc -->|Update Status| NotifSvc
+    
+    UserSvc -->|Metrics| Prometheus
+    ProductSvc -->|Metrics| Prometheus
+    OrderSvc -->|Metrics| Prometheus
+    PaymentSvc -->|Metrics| Prometheus
+    InventorySvc -->|Metrics| Prometheus
+    NotifSvc -->|Metrics| Prometheus
+    AdminSvc -->|Metrics| Prometheus
+    
+    Prometheus --> Grafana
+    
+    UserSvc -->|Logs| Loki
+    ProductSvc -->|Logs| Loki
+    OrderSvc -->|Logs| Loki
+    PaymentSvc -->|Logs| Loki
+    InventorySvc -->|Logs| Loki
+    NotifSvc -->|Logs| Loki
+
+    style NGINX fill:#ff6b6b
+    style Keycloak fill:#ffd93d
+    style UserSvc fill:#6bcf7f
+    style ProductSvc fill:#6bcf7f
+    style OrderSvc fill:#6bcf7f
+    style PaymentSvc fill:#6bcf7f
+    style InventorySvc fill:#6bcf7f
+    style NotifSvc fill:#6bcf7f
+    style AdminSvc fill:#6bcf7f
+    style Prometheus fill:#95e1d3
+    style Grafana fill:#95e1d3
+    style Loki fill:#95e1d3

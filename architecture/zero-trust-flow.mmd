@@ -1,0 +1,47 @@
+sequenceDiagram
+    participant User as 👤 Utilisateur
+    participant Gateway as 🚪 API Gateway<br/>(NGINX)
+    participant Keycloak as 🔐 Keycloak<br/>(IdP)
+    participant Service as 🔧 Microservice
+    participant DB as 🗄️ Database
+
+    Note over User,DB: Principe Zero Trust: Ne jamais faire confiance, toujours vérifier
+
+    rect rgb(255, 230, 230)
+        Note over User,Keycloak: Phase 1: Authentification
+        User->>Gateway: 1. Requête de connexion<br/>(HTTPS/TLS)
+        Gateway->>Keycloak: 2. Redirection vers IdP
+        Keycloak->>User: 3. Page de connexion
+        User->>Keycloak: 4. Credentials (username/password)
+        Keycloak->>Keycloak: 5. Validation MFA (optionnel)
+        Keycloak->>User: 6. JWT Access Token + Refresh Token
+    end
+
+    rect rgb(230, 255, 230)
+        Note over User,Service: Phase 2: Autorisation (RBAC)
+        User->>Gateway: 7. Requête API + JWT Token<br/>(Header: Authorization Bearer)
+        Gateway->>Gateway: 8. Validation TLS Certificate
+        Gateway->>Keycloak: 9. Validation JWT Token<br/>(Signature, Expiration, Issuer)
+        Keycloak->>Gateway: 10. Token Valid + Claims<br/>(roles, permissions)
+        Gateway->>Gateway: 11. Vérification RBAC Policy<br/>(route autorisée pour ce rôle?)
+    end
+
+    rect rgb(230, 230, 255)
+        Note over Gateway,DB: Phase 3: Accès aux Ressources
+        Gateway->>Service: 12. Requête forwarded<br/>+ JWT + User Context
+        Service->>Service: 13. Validation JWT locale<br/>(double vérification)
+        Service->>Service: 14. Vérification permissions<br/>métier (ownership, etc.)
+        Service->>DB: 15. Requête DB<br/>(connexion chiffrée)
+        DB->>Service: 16. Données
+        Service->>Service: 17. Filtrage données<br/>(selon permissions)
+        Service->>Gateway: 18. Réponse JSON
+        Gateway->>User: 19. Réponse HTTPS
+    end
+
+    rect rgb(255, 255, 230)
+        Note over User,DB: Phase 4: Audit & Monitoring
+        Service->>Service: 20. Log action<br/>(qui, quoi, quand)
+        Service->>Service: 21. Métriques Prometheus<br/>(latence, erreurs)
+    end
+
+    Note over User,DB: Principes appliqués:<br/>✅ Chiffrement end-to-end (TLS)<br/>✅ Authentification forte (JWT + MFA)<br/>✅ Autorisation granulaire (RBAC)<br/>✅ Moindre privilège<br/>✅ Audit complet<br/>✅ Segmentation réseau

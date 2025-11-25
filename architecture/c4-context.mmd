@@ -1,0 +1,33 @@
+graph TB
+    subgraph "Utilisateurs"
+        Client[👤 Client<br/>Achète des produits]
+        Vendor[🏪 Vendeur<br/>Gère son catalogue]
+        Admin[👨‍💼 Administrateur<br/>Supervise la plateforme]
+    end
+
+    subgraph "Plateforme E-Commerce Zero Trust"
+        Gateway[🚪 API Gateway<br/>NGINX + Auth]
+        Platform[🏢 Microservices Platform<br/>Services métier + Keycloak]
+    end
+
+    subgraph "Systèmes Externes"
+        Payment[💳 Passerelle Paiement<br/>Simulation]
+        Email[📧 Service Email<br/>Notifications]
+        Monitoring[📊 Monitoring<br/>Prometheus/Grafana]
+    end
+
+    Client -->|HTTPS| Gateway
+    Vendor -->|HTTPS| Gateway
+    Admin -->|HTTPS| Gateway
+    
+    Gateway -->|JWT Auth| Platform
+    
+    Platform -->|API| Payment
+    Platform -->|SMTP| Email
+    Platform -->|Metrics| Monitoring
+
+    style Gateway fill:#ff9999
+    style Platform fill:#99ccff
+    style Payment fill:#ffcc99
+    style Email fill:#ffcc99
+    style Monitoring fill:#99ff99

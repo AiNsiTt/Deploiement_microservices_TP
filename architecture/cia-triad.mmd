@@ -1,0 +1,78 @@
+graph TB
+    subgraph "Triade CIA dans l'Architecture"
+        CIA[🛡️ Triade CIA<br/>Confidentialité - Intégrité - Disponibilité]
+    end
+
+    subgraph "CONFIDENTIALITÉ 🔒"
+        C1[TLS/HTTPS<br/>Chiffrement en transit]
+        C2[Chiffrement DB<br/>Données au repos]
+        C3[JWT Tokens<br/>Authentification sécurisée]
+        C4[RBAC Keycloak<br/>Contrôle d'accès]
+        C5[Secrets Management<br/>Variables d'environnement]
+        C6[Network Isolation<br/>Docker networks privés]
+    end
+
+    subgraph "INTÉGRITÉ ✅"
+        I1[JWT Signature<br/>Validation tokens]
+        I2[API Validation<br/>Schema validation]
+        I3[Database Constraints<br/>Contraintes référentielles]
+        I4[Audit Logs<br/>Traçabilité complète]
+        I5[Checksums<br/>Vérification données]
+        I6[Transaction ACID<br/>Cohérence DB]
+    end
+
+    subgraph "DISPONIBILITÉ 🚀"
+        A1[Load Balancing<br/>NGINX upstream]
+        A2[Health Checks<br/>Docker healthcheck]
+        A3[Auto-restart<br/>Docker restart policy]
+        A4[Database Replication<br/>PostgreSQL HA]
+        A5[Redis Cache<br/>Performance]
+        A6[Rate Limiting<br/>Protection DDoS]
+        A7[Circuit Breaker<br/>Résilience]
+        A8[Monitoring<br/>Prometheus + Grafana]
+    end
+
+    CIA --> C1
+    CIA --> C2
+    CIA --> C3
+    CIA --> C4
+    CIA --> C5
+    CIA --> C6
+
+    CIA --> I1
+    CIA --> I2
+    CIA --> I3
+    CIA --> I4
+    CIA --> I5
+    CIA --> I6
+
+    CIA --> A1
+    CIA --> A2
+    CIA --> A3
+    CIA --> A4
+    CIA --> A5
+    CIA --> A6
+    CIA --> A7
+    CIA --> A8
+
+    style CIA fill:#ffd93d,stroke:#333,stroke-width:4px
+    style C1 fill:#ffb3ba
+    style C2 fill:#ffb3ba
+    style C3 fill:#ffb3ba
+    style C4 fill:#ffb3ba
+    style C5 fill:#ffb3ba
+    style C6 fill:#ffb3ba
+    style I1 fill:#bae1ff
+    style I2 fill:#bae1ff
+    style I3 fill:#bae1ff
+    style I4 fill:#bae1ff
+    style I5 fill:#bae1ff
+    style I6 fill:#bae1ff
+    style A1 fill:#baffc9
+    style A2 fill:#baffc9
+    style A3 fill:#baffc9
+    style A4 fill:#baffc9
+    style A5 fill:#baffc9
+    style A6 fill:#baffc9
+    style A7 fill:#baffc9
+    style A8 fill:#baffc9

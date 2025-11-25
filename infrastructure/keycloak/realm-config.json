@@ -1,0 +1,137 @@
+{
+  "realm": "ecommerce",
+  "enabled": true,
+  "displayName": "E-Commerce Platform",
+  "displayNameHtml": "<b>E-Commerce Platform</b>",
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrateur de la plateforme"
+      },
+      {
+        "name": "vendor",
+        "description": "Vendeur sur la plateforme"
+      },
+      {
+        "name": "client",
+        "description": "Client acheteur"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@ecommerce.com",
+      "firstName": "Admin",
+      "lastName": "System",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "vendor1",
+      "enabled": true,
+      "email": "vendor@ecommerce.com",
+      "firstName": "John",
+      "lastName": "Vendor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "vendor123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["vendor"]
+    },
+    {
+      "username": "client1",
+      "enabled": true,
+      "email": "client@ecommerce.com",
+      "firstName": "Jane",
+      "lastName": "Client",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "client123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["client"]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "ecommerce-frontend",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost"
+      ],
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true
+    },
+    {
+      "clientId": "ecommerce-backend",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "ecommerce-backend-secret-key-2025",
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "microservices",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

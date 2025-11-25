@@ -1,0 +1,112 @@
+# Prometheus Configuration
+# Architecture Microservices Zero Trust
+# Auteur: Quentin Chaillou
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'ecommerce-platform'
+    environment: 'development'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # User Service
+  - job_name: 'user-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['user-service:8001']
+        labels:
+          service: 'user-service'
+
+  # Product Service
+  - job_name: 'product-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['product-service:8002']
+        labels:
+          service: 'product-service'
+
+  # Order Service
+  - job_name: 'order-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['order-service:8003']
+        labels:
+          service: 'order-service'
+
+  # Payment Service
+  - job_name: 'payment-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['payment-service:8004']
+        labels:
+          service: 'payment-service'
+
+  # Inventory Service
+  - job_name: 'inventory-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['inventory-service:8005']
+        labels:
+          service: 'inventory-service'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['notification-service:8006']
+        labels:
+          service: 'notification-service'
+
+  # Admin Dashboard
+  - job_name: 'admin-dashboard'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['admin-dashboard:8007']
+        labels:
+          service: 'admin-dashboard'
+
+  # NGINX Gateway
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+        labels:
+          service: 'nginx-gateway'
+
+  # PostgreSQL Databases
+  - job_name: 'postgres'
+    static_configs:
+      - targets: 
+          - 'user-db:5432'
+          - 'product-db:5432'
+          - 'order-db:5432'
+          - 'payment-db:5432'
+          - 'inventory-db:5432'
+        labels:
+          service: 'postgresql'
+
+  # Redis Cache
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+        labels:
+          service: 'redis'
+
+  # Keycloak
+  - job_name: 'keycloak'
+    static_configs:
+      - targets: ['keycloak:8080']
+        labels:
+          service: 'keycloak'

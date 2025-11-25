@@ -66,7 +66,7 @@ Tous les services doivent afficher l'état "Up (healthy)".
 Pour obtenir un token d'accès, exécutez la commande suivante :
 
 ```bash
-curl -X POST http://localhost:8080/auth/realms/ecommerce/protocol/openid-connect/token \
+curl -X POST http://localhost:8080/realms/ecommerce/protocol/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=client1" \
   -d "password=client123" \

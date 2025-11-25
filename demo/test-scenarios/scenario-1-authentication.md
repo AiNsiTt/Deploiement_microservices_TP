@@ -14,7 +14,7 @@ Démontrer le fonctionnement du Zero Trust avec authentification Keycloak et aut
 ### Requête
 
 ```bash
-curl -X POST http://localhost:8080/auth/realms/ecommerce/protocol/openid-connect/token \
+curl -X POST http://localhost:8080/realms/ecommerce/protocol/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=client1" \
   -d "password=client123" \
@@ -106,7 +106,7 @@ Réponse 403 Forbidden :
 ### Requête
 
 ```bash
-curl -X POST http://localhost:8080/auth/realms/ecommerce/protocol/openid-connect/token \
+curl -X POST http://localhost:8080/realms/ecommerce/protocol/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=vendor1" \
   -d "password=vendor123" \

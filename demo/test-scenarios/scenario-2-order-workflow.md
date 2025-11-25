@@ -1,6 +1,7 @@
 # Scénario de Test 2 : Workflow Complet de Commande
 
 ## Objectif
+
 Démontrer la communication inter-services sécurisée et le workflow complet d'une commande.
 
 ## Flux de la Commande
@@ -12,12 +13,14 @@ Client → Order Service → Inventory Service (vérification stock)
 ```
 
 ## Prérequis
+
 - Authentification en tant que client (voir Scénario 1)
 - Token JWT valide
 
 ## Étape 1 : Consulter les Produits Disponibles
 
 ### Requête
+
 ```bash
 TOKEN="<access_token>"
 
@@ -26,17 +29,20 @@ curl -X GET http://localhost/api/products \
 ```
 
 ### Résultat attendu
-✅ Liste des produits avec leur stock
+
+Liste des produits avec leur stock
 
 ## Étape 2 : Vérifier le Stock d'un Produit
 
 ### Requête
+
 ```bash
 curl -X GET http://localhost/api/inventory/1 \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Résultat attendu
+
 ```json
 {
   "product_id": 1,
@@ -50,6 +56,7 @@ curl -X GET http://localhost/api/inventory/1 \
 ## Étape 3 : Créer une Commande
 
 ### Requête
+
 ```bash
 curl -X POST http://localhost/api/orders \
   -H "Authorization: Bearer $TOKEN" \
@@ -94,7 +101,9 @@ curl -X POST http://localhost/api/orders \
    ```
 
 ### Résultat attendu
-✅ Réponse 201 Created
+
+Réponse 201 Created :
+
 ```json
 {
   "id": 2,
@@ -108,19 +117,22 @@ curl -X POST http://localhost/api/orders \
 ```
 
 ### Validation de sécurité
-- ✅ Chaque appel inter-services propage le JWT token
-- ✅ Chaque service valide le token indépendamment
-- ✅ Principe de défense en profondeur
+
+- Chaque appel inter-services propage le JWT token
+- Chaque service valide le token indépendamment
+- Principe de défense en profondeur
 
 ## Étape 4 : Vérifier la Notification
 
 ### Requête
+
 ```bash
 curl -X GET http://localhost/api/notifications/user/3 \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Résultat attendu
+
 ```json
 [
   {
@@ -137,12 +149,14 @@ curl -X GET http://localhost/api/notifications/user/3 \
 ## Étape 5 : Consulter le Paiement
 
 ### Requête
+
 ```bash
 curl -X GET http://localhost/api/payments/order/2 \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Résultat attendu
+
 ```json
 [
   {
@@ -159,12 +173,14 @@ curl -X GET http://localhost/api/payments/order/2 \
 ## Étape 6 : Vérifier la Mise à Jour du Stock
 
 ### Requête
+
 ```bash
 curl -X GET http://localhost/api/inventory/1 \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Résultat attendu
+
 ```json
 {
   "product_id": 1,
@@ -176,12 +192,14 @@ curl -X GET http://localhost/api/inventory/1 \
 ```
 
 ### Validation
-- ✅ Le stock disponible a diminué de 2 unités
-- ✅ Les unités sont marquées comme réservées
+
+- Le stock disponible a diminué de 2 unités
+- Les unités sont marquées comme réservées
 
 ## Scénario d'Échec : Stock Insuffisant
 
 ### Requête
+
 ```bash
 curl -X POST http://localhost/api/orders \
   -H "Authorization: Bearer $TOKEN" \
@@ -200,7 +218,9 @@ curl -X POST http://localhost/api/orders \
 ```
 
 ### Résultat attendu
-❌ Réponse 400 Bad Request
+
+Réponse 400 Bad Request :
+
 ```json
 {
   "detail": "Insufficient stock"
@@ -208,18 +228,20 @@ curl -X POST http://localhost/api/orders \
 ```
 
 ### Validation
-- ✅ La commande est rejetée avant le paiement
-- ✅ Aucune transaction financière n'est effectuée
-- ✅ L'intégrité des données est préservée
+
+- La commande est rejetée avant le paiement
+- Aucune transaction financière n'est effectuée
+- L'intégrité des données est préservée
 
 ## Conclusion
 
 Ce scénario démontre :
-- ✅ Communication inter-services sécurisée (JWT propagation)
-- ✅ Workflow transactionnel complet
-- ✅ Gestion des erreurs et rollback
-- ✅ Intégrité des données (triade CIA - Intégrité)
-- ✅ Traçabilité complète (logs, notifications)
+
+- Communication inter-services sécurisée (JWT propagation)
+- Workflow transactionnel complet
+- Gestion des erreurs et rollback
+- Intégrité des données (triade CIA - Intégrité)
+- Traçabilité complète (logs, notifications)
 
 ## Diagramme de Séquence
 
